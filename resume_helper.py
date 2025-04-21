@@ -236,6 +236,10 @@ def analyze_user_resume(text):
 
 #print(analyze_user_resume("/content/ODESANYA KONYINSOLA'S RESUME.pdf"))
 
+def display_ai_user_resume(pdf_file):
+  extracted_text = extract_text(pdf_file)
+  return analyze_user_resume(extracted_text)
+
 """## Getting Online Resumes"""
 
 def get_resumes_from_web(company_name, job_type):
@@ -574,19 +578,21 @@ with gr.Blocks() as ui:
   with gr.Row():
     with gr.Column(variant='panel', scale=5):
       file = gr.File(label="Please upload a PDF or Word Document of your resume", file_types=[".pdf", ".docx"])
-      company_name = gr.Textbox(label = "Input name of company intrested in applying to", placeholder = "e.g. Google, Amazon, KPMG, ARCO", value = "Google")
-      job_role = gr.Textbox(label = "Input intrested job role", placeholder = "e.g. Software Developer, Accountant, Business Analyst", value = "Software Developer")
+      company_name = gr.Textbox(label = "Input name of company intrested in applying to", placeholder = "e.g. Google, Amazon, KPMG, ARCO")
+      job_role = gr.Textbox(label = "Input intrested job role", placeholder = "e.g. Software Developer, Accountant, Business Analyst")
       with gr.Row():
         generate_btn = gr.Button("Generate")
         clear_btn = gr.ClearButton(value="Clear")
-      show_pdf = PDF(label='Document preview', interactive=False, visible=True, height=800)
+      user_resume_insight = gr.Markdown(label = "AI formatted User Resume", height=800, show_copy_button=True, line_breaks=True)
+      #show_pdf = PDF(label='Document preview', interactive=False, visible=True, height=800)
 
     with gr.Column(variant='panel', scale=5):
       output = gr.Markdown(label="Generated Output", height=1100, show_copy_button=True, line_breaks=True)
 
-  file.change(fn=display_pdf, inputs=file, outputs=show_pdf)
+  #file.change(fn=display_pdf, inputs=file, outputs=show_pdf)
+  file.change(fn=display_ai_user_resume, inputs = file, outputs=user_resume_insight)
   generate_btn.click(fn=get_resume_insight_interface, inputs=[file, company_name, job_role], outputs=output)
-  clear_btn.add([file, company_name, job_role, output, show_pdf])
+  clear_btn.add([file, company_name, job_role, output, user_resume_insight])
 
 ui.launch(inbrowser=True, debug=True)
 
